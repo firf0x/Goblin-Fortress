@@ -13,15 +13,13 @@ namespace MainProgram
             using (GameWindow game = new GameWindow())
             {
                 game.Title = "Test Window";
-                game.Width = 640;
-                game.Height = 640;
+                game.Width = 1280;
+                game.Height = 720;
              
                 render = new Render(game);
 
                 game.Create();
             }
         }
-    
     }
-
 }

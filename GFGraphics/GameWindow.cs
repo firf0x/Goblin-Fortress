@@ -1,4 +1,5 @@
-﻿using SDL2;
+﻿using GFGraphics.Graphics.RenderViewConsole;
+using SDL2;
 
 namespace GFGraphics
 {
@@ -47,6 +48,9 @@ namespace GFGraphics
             {
                 Debug.LogError($"SDL_CreateWindow failed: {SDL.SDL_GetError()}");
             }
+            
+            // Create RVC
+            RVC rvc = new RVC(this);
 
             // Main loop
             bool run = true;
@@ -70,10 +74,16 @@ namespace GFGraphics
                 UpdateFrame?.Invoke();
                 RenderFrame?.Invoke();
 
+                // framerate:
+                // 16 = 60.0fps
+                // 33 ~ 30.0fps
                 SDL.SDL_Delay(16);
             }
             OnUnload?.Invoke();
+            
             Dispose();
+
+            rvc.Dispose();
         }
 
 

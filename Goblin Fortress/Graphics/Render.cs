@@ -1,7 +1,9 @@
 ﻿using GFGraphics;
+using GFGraphics.Graphics.RenderViewConsole;
 using Goblin_Fortress.Logger;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,8 +26,9 @@ namespace Goblin_Fortress.Graphics
 
         private void OnLoad()
         {
-
+            
         }
+
         private void OnUnload()
         {
 
@@ -33,12 +36,24 @@ namespace Goblin_Fortress.Graphics
 
         private void OnUpdate()
         {
-            Debug.Log("Update");
+
+            //Debug.Log("Update");
         }
 
         private void OnRenderFrame()
         {
-            //Debug.Log("Render Update");
+            RVC.ClearColor(Color.Black);
+
+            RVC.Begin(PrimitiveType.LineLoop);
+
+            RVC.VertexColor(Color.White);
+            RVC.Vertex2(100, 100);
+            RVC.Vertex2(200, 100);
+            RVC.Vertex2(100, 200);
+
+            RVC.End();
+
+            RVC.SwapBuffers();
         }
 
         public void Dispose()
