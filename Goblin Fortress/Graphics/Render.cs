@@ -1,10 +1,12 @@
 ﻿using GFGraphics;
+using GFGraphics.Compoents;
 using GFGraphics.Graphics.RenderViewConsole;
 using Goblin_Fortress.Logger;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +15,7 @@ namespace Goblin_Fortress.Graphics
     internal class Render : IDisposable
     {
         private GameWindow _window;
+        private int angle = 0;
         internal Render(GameWindow window) 
         {
             _window = window;
@@ -44,16 +47,28 @@ namespace Goblin_Fortress.Graphics
         {
             RVC.ClearColor(Color.Black);
 
+            // Create List
+            DisplayList.NewList();
+
+            // Begin
             RVC.Begin(PrimitiveType.LineLoop);
 
-            RVC.VertexColor(Color.White);
-            RVC.Vertex2(100, 100);
-            RVC.Vertex2(200, 100);
-            RVC.Vertex2(100, 200);
 
+
+            // End
             RVC.End();
 
+            // Render all render block
+            DisplayList.EndList();
+            
             RVC.SwapBuffers();
+            
+            angle += 1;
+
+            if (angle > 360)
+            {
+                angle = 0;
+            }
         }
 
         public void Dispose()

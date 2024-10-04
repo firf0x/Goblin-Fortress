@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GFGraphics.Compoents;
 
 namespace GFGraphics.Graphics.RVC.RenderBeginEnd
 {
@@ -12,6 +13,6 @@ namespace GFGraphics.Graphics.RVC.RenderBeginEnd
     /// </summary>
     internal struct RBE
     {
-        internal SDL.SDL_Point[] points;
+        public SDL.SDL_Point[] points;
     }
 }

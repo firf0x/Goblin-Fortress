@@ -15,6 +15,7 @@ namespace MainProgram
                 game.Title = "Test Window";
                 game.Width = 1280;
                 game.Height = 720;
+                game.Flags = SDL2.SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
              
                 render = new Render(game);
 

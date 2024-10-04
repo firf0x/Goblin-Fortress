@@ -22,11 +22,6 @@ namespace GFGraphics.Graphics.RenderViewConsole
         LineStrip,
         LineLoop,
 
-        // Triangles
-        Triangles,
-        TrianglesStrip,
-        TrianglesFan,
-
         // Quads
         Quads,
         QuadsStrip,
