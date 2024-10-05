@@ -40,15 +40,32 @@ namespace GFGraphics.Graphics.RenderViewConsole
         public static void Begin(PrimitiveType type)
         {
             if (Type != PrimitiveType.None) return;
+
+            Type = type;
+
+            rbe.points = new SDL.SDL_Point[pointsCapacity];
+            pointIndex = 0;
+
+        }
+
+        /// <summary>
+        /// Creates a list of points that need to be drawn with a certain type also supports DisplayList.
+        /// </summary>
+        public static void Begin(PrimitiveType type, int displayIndex)
+        {
+            if (Type != PrimitiveType.None) return;
             if (_isReadCommand == true)
             {
-                DisplayList.RenderBlocks.Add(() =>
+                if(DisplayList._displays.TryGetValue((uint)displayIndex, out DisplayList display))
                 {
-                    Type = type;
+                    display.RenderBlocks.Add(() =>
+                    {
+                        Type = type;
 
-                    rbe.points = new SDL.SDL_Point[pointsCapacity];
-                    pointIndex = 0;
-                });
+                        rbe.points = new SDL.SDL_Point[pointsCapacity];
+                        pointIndex = 0;
+                    });
+                }
                 return;
             }
 
@@ -67,14 +84,17 @@ namespace GFGraphics.Graphics.RenderViewConsole
         /// <summary>
         /// Point color
         /// </summary>
-        public static void VertexColor(Color color)
+        public static void VertexColor(Color color, int displayIndex)
         {
             if(_isReadCommand == true)
             {
-                DisplayList.RenderBlocks.Add(() =>
+                if (DisplayList._displays.TryGetValue((uint)displayIndex, out DisplayList display))
                 {
-                    SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
-                });
+                    display.RenderBlocks.Add(() =>
+                    {
+                        SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+                    });
+                }
                 return;
             }
             SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
@@ -85,23 +105,45 @@ namespace GFGraphics.Graphics.RenderViewConsole
         /// </summary>
         public static void Vertex2(float x, float y)
         {
+            if (pointIndex >= pointsCapacity)
+            {
+                // Let's allocate another array of points
+                pointsCapacity *= 2;
+                SDL.SDL_Point[] newPoints = new SDL.SDL_Point[pointsCapacity];
+                Array.Copy(rbe.points, newPoints, rbe.points.Length);
+                rbe.points = newPoints;
+            }
+
+            rbe.points[pointIndex].x = (int)x;
+            rbe.points[pointIndex].y = (int)y;
+            pointIndex++;
+        }
+
+        /// <summary>
+        /// 2D point also supports DisplayList.
+        /// </summary>
+        public static void Vertex2(float x, float y, int displayIndex)
+        {
             if (_isReadCommand == true)
             {
-                DisplayList.RenderBlocks.Add(() =>
+                if (DisplayList._displays.TryGetValue((uint)displayIndex, out DisplayList display))
                 {
-                    if (pointIndex >= pointsCapacity)
+                    display.RenderBlocks.Add(() =>
                     {
-                        // Let's allocate another array of points
-                        pointsCapacity *= 2;
-                        SDL.SDL_Point[] newPoints = new SDL.SDL_Point[pointsCapacity];
-                        Array.Copy(rbe.points, newPoints, rbe.points.Length);
-                        rbe.points = newPoints;
-                    }
+                        if (pointIndex >= pointsCapacity)
+                        {
+                            // Let's allocate another array of points
+                            pointsCapacity *= 2;
+                            SDL.SDL_Point[] newPoints = new SDL.SDL_Point[pointsCapacity];
+                            Array.Copy(rbe.points, newPoints, rbe.points.Length);
+                            rbe.points = newPoints;
+                        }
 
-                    rbe.points[pointIndex].x = (int)x;
-                    rbe.points[pointIndex].y = (int)y;
-                    pointIndex++;
-                });
+                        rbe.points[pointIndex].x = (int)x;
+                        rbe.points[pointIndex].y = (int)y;
+                        pointIndex++;
+                    });
+                }
                 return;
             }
             if (pointIndex >= pointsCapacity)
@@ -124,61 +166,6 @@ namespace GFGraphics.Graphics.RenderViewConsole
         /// </summary>
         public static void End()
         {
-            if(_isReadCommand == true)
-            {
-                DisplayList.RenderBlocks.Add(() =>
-                {
-                    switch (Type)
-                    {
-                        case PrimitiveType.Points:
-                            SDL.SDL_RenderDrawPoints(renderer, rbe.points, rbe.points.Length);
-                            break;
-
-                        case PrimitiveType.Lines:
-                            if (pointIndex >= 3) pointIndex = 2;
-                            SDL.SDL_RenderDrawLines(renderer, rbe.points, pointIndex);
-                            break;
-
-                        case PrimitiveType.LineStrip:
-                            SDL.SDL_RenderDrawLines(renderer, rbe.points, pointIndex);
-                            break;
-
-                        case PrimitiveType.LineLoop:
-                            rbe.points[pointIndex] = rbe.points[0];
-                            pointIndex++;
-                            SDL.SDL_RenderDrawLines(renderer, rbe.points, pointIndex);
-                            break;
-
-                        case PrimitiveType.Quads:
-                            if (pointIndex < 4) return;
-                            for (int i = 0; i < pointIndex; i += 4)
-                            {
-                                SDL.SDL_Rect rect = new SDL.SDL_Rect();
-
-                                rect.x = rbe.points[i].x;
-                                rect.y = rbe.points[i].y;
-                                rect.w = rbe.points[i + 2].x - rbe.points[i].x;
-                                rect.h = rbe.points[i + 2].y - rbe.points[i].y;
-                                SDL.SDL_RenderFillRect(renderer, ref rect);
-                            }
-                            break;
-
-                        case PrimitiveType.QuadsStrip:
-
-                            break;
-
-                        case PrimitiveType.Polygon:
-
-                            break;
-
-                        default:
-
-                            break;
-                    }
-                    Type = PrimitiveType.None;
-                });
-                return;
-            }
 
             switch (Type)
             {
@@ -229,7 +216,71 @@ namespace GFGraphics.Graphics.RenderViewConsole
             }
             Type = PrimitiveType.None;
         }
+        
+        /// <summary>
+        /// Start drawing all points also supports DisplayList. 
+        /// </summary>
+        public static void End(int displayIndex)
+        {
+            if (_isReadCommand == true)
+            {
+                if (DisplayList._displays.TryGetValue((uint)displayIndex, out DisplayList display))
+                {
+                    display.RenderBlocks.Add(() =>
+                    {
+                        switch (Type)
+                        {
+                            case PrimitiveType.Points:
+                                SDL.SDL_RenderDrawPoints(renderer, rbe.points, rbe.points.Length);
+                                break;
 
+                            case PrimitiveType.Lines:
+                                if (pointIndex >= 3) pointIndex = 2;
+                                SDL.SDL_RenderDrawLines(renderer, rbe.points, pointIndex);
+                                break;
+
+                            case PrimitiveType.LineStrip:
+                                SDL.SDL_RenderDrawLines(renderer, rbe.points, pointIndex);
+                                break;
+
+                            case PrimitiveType.LineLoop:
+                                rbe.points[pointIndex] = rbe.points[0];
+                                pointIndex++;
+                                SDL.SDL_RenderDrawLines(renderer, rbe.points, pointIndex);
+                                break;
+
+                            case PrimitiveType.Quads:
+                                if (pointIndex < 4) return;
+                                for (int i = 0; i < pointIndex; i += 4)
+                                {
+                                    SDL.SDL_Rect rect = new SDL.SDL_Rect();
+
+                                    rect.x = rbe.points[i].x;
+                                    rect.y = rbe.points[i].y;
+                                    rect.w = rbe.points[i + 2].x - rbe.points[i].x;
+                                    rect.h = rbe.points[i + 2].y - rbe.points[i].y;
+                                    SDL.SDL_RenderFillRect(renderer, ref rect);
+                                }
+                                break;
+
+                            case PrimitiveType.QuadsStrip:
+
+                                break;
+
+                            case PrimitiveType.Polygon:
+
+                                break;
+
+                            default:
+
+                                break;
+                        }
+                        Type = PrimitiveType.None;
+                    });
+                }
+                return;
+            }
+        }
         /// <summary>
         /// Paints the window in the color of your choice.
         /// </summary>

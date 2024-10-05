@@ -16,6 +16,8 @@ namespace Goblin_Fortress.Graphics
     {
         private GameWindow _window;
         private int angle = 0;
+
+        private int DisplayIndex;
         internal Render(GameWindow window) 
         {
             _window = window;
@@ -48,19 +50,25 @@ namespace Goblin_Fortress.Graphics
             RVC.ClearColor(Color.Black);
 
             // Create List
-            DisplayList.NewList();
-
-            // Begin
-            RVC.Begin(PrimitiveType.LineLoop);
+            DisplayIndex = DisplayList.NewList(1, DisplayList.ListMode.Compile);
 
 
+                // Begin
+                RVC.Begin(PrimitiveType.LineLoop, DisplayIndex);
+                
+                RVC.VertexColor(Color.White, DisplayIndex);
+                RVC.Vertex2(100, 100, DisplayIndex);
+                RVC.Vertex2(600, 100, DisplayIndex);
+                RVC.Vertex2(450, 300, DisplayIndex);
+                // End
+                RVC.End(DisplayIndex);
 
-            // End
-            RVC.End();
-
-            // Render all render block
+            // Render all render block 
             DisplayList.EndList();
-            
+
+            // Call all invoke 
+            DisplayList.CallLists();
+
             RVC.SwapBuffers();
             
             angle += 1;

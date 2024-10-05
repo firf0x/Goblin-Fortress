@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,32 +10,50 @@ namespace GFGraphics.Compoents
 {
     public class DisplayList
     {
-        internal static List<DisplayList> displays = new List<DisplayList>();
+        internal static Dictionary<uint, DisplayList> _displays = new Dictionary<uint, DisplayList>();
         internal List<Action> RenderBlocks = new List<Action>();
 
-        private static int displayIndex = -1;
+        private static bool _activate;
 
-        public static void NewList(int listId, ListMode mode)
+        private static List<uint> _diplaysIndex = new List<uint>();
+
+        public static int NewList(uint listId, ListMode mode)
         {
-            displayIndex = listId;
-            displays[displayIndex] = new DisplayList();
-            RVC._isReadCommand = true;
+            if (mode == ListMode.Compile)
+            {
+                if (!_displays.ContainsKey(listId))
+                {
+                    _displays[listId] = new DisplayList();
+                }
+                _activate = true;
+            }
+            else if (mode == ListMode.RunTime)
+            {
+                _activate = false;
+            }
+            RVC._isReadCommand = _activate;
+            return (int)listId;
         }
 
         public static void EndList()
         {
-            var list = displays.ElementAt(displayIndex);
-            foreach (var block in list.RenderBlocks)
-            {
-                block?.Invoke();
-            }
-            RVC._isReadCommand = false;
-            list.RenderBlocks.Clear();
+            RVC._isReadCommand = _activate;
         }
 
+        public static void CallLists()
+        {
+            foreach (var display in _displays)
+            {
+                foreach(var item in display.Value.RenderBlocks)
+                {
+                    item.Invoke();
+                }
+            }
+        }
         public enum ListMode
         {
-            Compile
+            Compile,
+            RunTime
         }
     }
 }
