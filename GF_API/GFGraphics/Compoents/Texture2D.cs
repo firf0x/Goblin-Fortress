@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GF_API.Logger;
 
-namespace GFGraphics.Compoents
+namespace GF_API.GFGraphics.Compoents
 {
     public struct Texture2D : IDisposable
     {

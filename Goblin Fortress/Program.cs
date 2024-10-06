@@ -1,7 +1,5 @@
-﻿using GFGraphics;
+﻿using GF_API.GFWindow;
 using Goblin_Fortress.Graphics;
-using System;
-
 
 namespace MainProgram
 {

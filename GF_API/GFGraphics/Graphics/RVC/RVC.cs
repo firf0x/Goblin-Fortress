@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using GFGraphics.Compoents;
-using GFGraphics.Graphics.RVC;
-using GFGraphics.Graphics.RVC.RenderBeginEnd;
+﻿using System.Drawing;
+using GF_API.GFGraphics.Compoents;
+using GF_API.GFGraphics.Graphics.RVC.RenderBeginEnd;
+using GF_API.GFWindow;
 using SDL2;
 
-namespace GFGraphics.Graphics.RenderViewConsole
+namespace GF_API.GFGraphics.Graphics.RenderViewConsole
 {
     /// <summary>
     /// Render View Console 
@@ -84,6 +78,13 @@ namespace GFGraphics.Graphics.RenderViewConsole
         /// <summary>
         /// Point color
         /// </summary>
+        public static void VertexColor(Color color)
+        {
+            SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+        }
+        /// <summary>
+        /// Point color also supports DisplayList.
+        /// </summary> 
         public static void VertexColor(Color color, int displayIndex)
         {
             if(_isReadCommand == true)

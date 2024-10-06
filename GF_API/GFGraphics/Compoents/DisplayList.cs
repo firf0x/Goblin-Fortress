@@ -1,4 +1,4 @@
-﻿using GFGraphics.Graphics.RenderViewConsole;
+﻿using GF_API.GFGraphics.Graphics.RenderViewConsole;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,8 +6,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GFGraphics.Compoents
+namespace GF_API.GFGraphics.Compoents
 {
+    /// <summary>
+    /// The display list collects all render requests and outputs them in one call.
+    /// </summary>
     public class DisplayList
     {
         internal static Dictionary<uint, DisplayList> _displays = new Dictionary<uint, DisplayList>();

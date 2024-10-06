@@ -1,14 +1,10 @@
-﻿using GFGraphics;
-using GFGraphics.Compoents;
-using GFGraphics.Graphics.RenderViewConsole;
-using Goblin_Fortress.Logger;
-using System;
-using System.Collections.Generic;
+﻿using GF_API.GFGraphics;
+using GF_API.GFGraphics.Compoents;
+using GF_API.GFGraphics.Graphics.RenderViewConsole;
+using GF_API.GFInput;
+using GF_API.Logger;
+using GF_API.GFWindow;
 using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Goblin_Fortress.Graphics
 {
@@ -16,6 +12,8 @@ namespace Goblin_Fortress.Graphics
     {
         private GameWindow _window;
         private int angle = 0;
+
+        private Point position;
 
         private int DisplayIndex;
         internal Render(GameWindow window) 
@@ -41,8 +39,19 @@ namespace Goblin_Fortress.Graphics
 
         private void OnUpdate()
         {
-
-            //Debug.Log("Update");
+            if (Input.GetKeyDown(Input.KeyCode.W))
+            {
+                Debug.Log("W", Debug.LogLevel.Warning);
+            }
+            if (Input.GetKeyUp(Input.KeyCode.Tab))
+            {
+                Debug.Log("Tab", Debug.LogLevel.Warning);
+            }
+            if (Input.GetKey(Input.KeyCode.Q))
+            {
+                Debug.Log("Q", Debug.LogLevel.Warning);
+            }
+            
         }
 
         private void OnRenderFrame()
@@ -52,16 +61,18 @@ namespace Goblin_Fortress.Graphics
             // Create List
             DisplayIndex = DisplayList.NewList(1, DisplayList.ListMode.Compile);
 
+            // Begin
+            RVC.Begin(PrimitiveType.Points);
 
-                // Begin
-                RVC.Begin(PrimitiveType.LineLoop, DisplayIndex);
-                
-                RVC.VertexColor(Color.White, DisplayIndex);
-                RVC.Vertex2(100, 100, DisplayIndex);
-                RVC.Vertex2(600, 100, DisplayIndex);
-                RVC.Vertex2(450, 300, DisplayIndex);
-                // End
-                RVC.End(DisplayIndex);
+            RVC.VertexColor(Color.White);
+
+            float x = (float)Math.Sin(360) * 10;
+            float y = (float)Math.Cos(360) * 10;
+            
+            RVC.Vertex2(_window.Width / 2 + x, _window.Height / 2 + y);
+
+            // End
+            RVC.End();
 
             // Render all render block 
             DisplayList.EndList();
@@ -70,13 +81,6 @@ namespace Goblin_Fortress.Graphics
             DisplayList.CallLists();
 
             RVC.SwapBuffers();
-            
-            angle += 1;
-
-            if (angle > 360)
-            {
-                angle = 0;
-            }
         }
 
         public void Dispose()

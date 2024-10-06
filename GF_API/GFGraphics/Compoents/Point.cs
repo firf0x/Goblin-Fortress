@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GFGraphics.Compoents
+namespace GF_API.GFGraphics.Compoents
 {
     /// <summary>
     /// Don't work ヾ(⌐■_■)ノ
     /// </summary>
     internal struct Point // Test
     {
-        public dynamic x { get; set; }
-        public dynamic y { get; set; }
+        public float x { get; set; }
+        public float y { get; set; }
     }
 }

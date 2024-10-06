@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Goblin_Fortress.Logger
+namespace GFWindow
 {
     internal static class Debug
     {

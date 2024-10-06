@@ -1,7 +1,7 @@
 ﻿using GFGraphics.Graphics.RenderViewConsole;
 using SDL2;
 
-namespace GFGraphics
+namespace GFWindow
 {
     public class GameWindow : IDisposable
     {
@@ -39,8 +39,9 @@ namespace GFGraphics
                 Debug.LogError("Width and Height must be greater than 0");
                 return;
             }
-            
-            if(SDL.SDL_Init(SDL.SDL_INIT_VIDEO) != 0)
+
+            // Init
+            if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) != 0)
             {
                 Debug.LogError($"SDL_Init failed: {SDL.SDL_GetError()}");
                 return;
@@ -48,11 +49,11 @@ namespace GFGraphics
 
             WindowPtr = SDL.SDL_CreateWindow(Title, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED, Width, Height, Flags);
 
-            if(WindowPtr == IntPtr.Zero)
+            if (WindowPtr == IntPtr.Zero)
             {
                 Debug.LogError($"SDL_CreateWindow failed: {SDL.SDL_GetError()}");
             }
-            
+
             // Create RVC
             RVC rvc = new RVC(this);
 
@@ -65,7 +66,7 @@ namespace GFGraphics
                 SDL.SDL_Event e;
                 while (SDL.SDL_PollEvent(out e) != 0)
                 {
-                    if(e.type == SDL.SDL_EventType.SDL_QUIT)
+                    if (e.type == SDL.SDL_EventType.SDL_QUIT)
                     {
                         exitRequested = true;
                         run = false;
@@ -95,7 +96,7 @@ namespace GFGraphics
                 isUpdate = !isUpdate;
                 isRender = !isRender;
             }
-            
+
             Dispose();
             rvc.Dispose();
 
