@@ -7,16 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="GameWindow.cs~RFda262e1.TMP" />
+    <Folder Include="GFGraphics\Interfaces\" />
+    <Folder Include="GFLogic\Components\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="LibNoise" Version="0.2.0" />
     <PackageReference Include="ppy.SDL2-CS" Version="1.0.82" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\GFInput\GFInput.csproj" />
-    <ProjectReference Include="..\GFWindow\GFWindow.csproj" />
   </ItemGroup>
 
 </Project>

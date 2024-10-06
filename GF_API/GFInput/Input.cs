@@ -1,21 +1,57 @@
 ﻿using SDL2;
 using System.Runtime.InteropServices;
-namespace GFInput
+
+namespace GF_API.GFInput
 {
-    public class Input
+    public static class Input
     {
         // TODO: Make a keyboard control system.
-        public SDL.SDL_ControllerAxisEvent AxisEvent;
-
-        public static bool InputHandler(KeyCode code)
+        private static byte[] prevKeysUp;
+        private static byte[] prevKeysDown;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public static bool GetKey(KeyCode code)
         {
-            IntPtr keyState = SDL.SDL_GetKeyboardState(out int keys);
-            byte[] keyboard = new byte[keys];
-            Marshal.Copy(keyState, keyboard, 0, keys);
-            
-            if (keyboard[(int)code] == 1) return true;
+            IntPtr origArray = SDL.SDL_GetKeyboardState(out int arraySize);
+            byte[] keys = new byte[arraySize];
+            byte keycode = (byte)SDL.SDL_GetScancodeFromKey((SDL.SDL_Keycode)code);
+            Marshal.Copy(origArray, keys, 0, arraySize);
+            return keys[keycode] == 1;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public static bool GetKeyDown(KeyCode code)
+        {
+            IntPtr origArray = SDL.SDL_GetKeyboardState(out int arraySize);
+            byte[] keys = new byte[arraySize];
 
-            else return false;
+            if (prevKeysDown == null) prevKeysDown = new byte[arraySize];
+
+            byte keycode = (byte)SDL.SDL_GetScancodeFromKey((SDL.SDL_Keycode)code);
+            Marshal.Copy(origArray, keys, 0, arraySize);
+            bool keyPressed = keys[keycode] == 1 && prevKeysDown[keycode] == 0;
+            prevKeysDown = (byte[])keys.Clone();
+            return keyPressed;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static bool GetKeyUp(KeyCode code)
+        {
+            IntPtr origArray = SDL.SDL_GetKeyboardState(out int arraySize);
+            byte[] keys = new byte[arraySize];
+            
+            if(prevKeysUp == null) prevKeysUp = new byte[arraySize];
+
+            byte keycode = (byte)SDL.SDL_GetScancodeFromKey((SDL.SDL_Keycode)code);
+            Marshal.Copy(origArray, keys, 0, arraySize);
+            bool keyRealized = keys[keycode] == 0 && prevKeysUp[keycode] == 1;
+            prevKeysUp = (byte[])keys.Clone();
+            return keyRealized;
         }
 
         public enum KeyCode

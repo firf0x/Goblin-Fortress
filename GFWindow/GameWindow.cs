@@ -1,6 +1,7 @@
-﻿using SDL2;
+﻿using GFGraphics.Graphics.RenderViewConsole;
+using SDL2;
 
-namespace GFGraphics
+namespace GFWindow
 {
     public class GameWindow : IDisposable
     {
@@ -10,6 +11,8 @@ namespace GFGraphics
         public int Width;
         public int Height;
 
+        public SDL.SDL_WindowFlags Flags;
+
         public event Action UpdateFrame;
 
         public event Action RenderFrame;
@@ -18,6 +21,8 @@ namespace GFGraphics
         public event Action OnUnload;
 
         private bool exitRequested = false;
+        private bool isUpdate = true;
+        private bool isRender = true;
 
         public void Create()
         {
@@ -34,19 +39,23 @@ namespace GFGraphics
                 Debug.LogError("Width and Height must be greater than 0");
                 return;
             }
-            
-            if(SDL.SDL_Init(SDL.SDL_INIT_VIDEO) != 0)
+
+            // Init
+            if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) != 0)
             {
                 Debug.LogError($"SDL_Init failed: {SDL.SDL_GetError()}");
                 return;
             }
 
-            WindowPtr = SDL.SDL_CreateWindow(Title, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED, Width, Height, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
+            WindowPtr = SDL.SDL_CreateWindow(Title, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED, Width, Height, Flags);
 
-            if(WindowPtr == IntPtr.Zero)
+            if (WindowPtr == IntPtr.Zero)
             {
                 Debug.LogError($"SDL_CreateWindow failed: {SDL.SDL_GetError()}");
             }
+
+            // Create RVC
+            RVC rvc = new RVC(this);
 
             // Main loop
             bool run = true;
@@ -57,7 +66,7 @@ namespace GFGraphics
                 SDL.SDL_Event e;
                 while (SDL.SDL_PollEvent(out e) != 0)
                 {
-                    if(e.type == SDL.SDL_EventType.SDL_QUIT)
+                    if (e.type == SDL.SDL_EventType.SDL_QUIT)
                     {
                         exitRequested = true;
                         run = false;
@@ -66,14 +75,32 @@ namespace GFGraphics
 
                 if (exitRequested) break;
 
-                // Update and render
-                UpdateFrame?.Invoke();
-                RenderFrame?.Invoke();
+                // Logic while
+                while (isUpdate)
+                {
+                    UpdateFrame?.Invoke();
+                    SDL.SDL_Delay(1);
+                    isUpdate = false;
+                }
 
-                SDL.SDL_Delay(16);
+                while (isRender)
+                {
+                    // framerate:
+                    // 16 = 60.0fps
+                    // 33 ~ 30.0fps
+                    RenderFrame?.Invoke();
+                    SDL.SDL_Delay(16);
+                    isRender = false;
+                }
+
+                isUpdate = !isUpdate;
+                isRender = !isRender;
             }
-            OnUnload?.Invoke();
+
             Dispose();
+            rvc.Dispose();
+
+            OnUnload?.Invoke();
         }
 
 
