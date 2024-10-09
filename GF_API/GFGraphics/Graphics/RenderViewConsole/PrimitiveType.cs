@@ -24,6 +24,7 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
 
         // Quads
         Quads,
+        QuadsTexture,
         QuadsStrip,
 
         // Polygon

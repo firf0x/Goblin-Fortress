@@ -1,4 +1,5 @@
 ﻿using GF_API.GFGraphics.Graphics.RenderViewConsole;
+using GF_API.Logger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +28,8 @@ namespace GF_API.GFGraphics.Compoents
                 if (!_displays.ContainsKey(listId))
                 {
                     _displays[listId] = new DisplayList();
+                    _activate = true;
                 }
-                _activate = true;
             }
             else if (mode == ListMode.RunTime)
             {
@@ -51,6 +52,7 @@ namespace GF_API.GFGraphics.Compoents
                 {
                     item.Invoke();
                 }
+                display.Value.RenderBlocks.Clear();
             }
         }
         public enum ListMode

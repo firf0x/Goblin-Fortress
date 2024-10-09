@@ -1,7 +1,7 @@
-﻿using System.Drawing;
-using GF_API.GFGraphics.Compoents;
-using GF_API.GFGraphics.Graphics.RVC.RenderBeginEnd;
+﻿using GF_API.GFGraphics.Compoents;
+using GF_API.GFGraphics.Graphics.RenderViewConsole.RenderBeginEnd;
 using GF_API.GFWindow;
+using GF_API.Logger;
 using SDL2;
 
 namespace GF_API.GFGraphics.Graphics.RenderViewConsole
@@ -12,7 +12,7 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
     public class RVC : IDisposable
     {
         private static GameWindow _window;
-        private static IntPtr renderer;
+        public static IntPtr renderer { get; private set; }
 
         internal static bool _isReadCommand = false;
 
@@ -21,6 +21,8 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
         private static PrimitiveType Type = PrimitiveType.None;
 
         private static RBE rbe;
+
+        private static Texture2D renderTexture;
 
         public RVC(GameWindow window)
         {
@@ -80,7 +82,7 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
         /// </summary>
         public static void VertexColor(Color color)
         {
-            SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+            SDL.SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
         }
         /// <summary>
         /// Point color also supports DisplayList.
@@ -93,12 +95,12 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
                 {
                     display.RenderBlocks.Add(() =>
                     {
-                        SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+                        SDL.SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
                     });
                 }
                 return;
             }
-            SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+            SDL.SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
         }
 
         /// <summary>
@@ -203,6 +205,23 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
                     }
                     break;
 
+                    //TODO: (?) QuadsTexture
+                case PrimitiveType.QuadsTexture:
+                    if (pointIndex < 4) return;
+
+                    for(int i = 0; i < pointIndex; i += 4)
+                    {
+                        SDL.SDL_Rect rect = new SDL.SDL_Rect();
+                        
+                        rect.x = rbe.points[i].x;
+                        rect.y = rbe.points[i].y;
+                        rect.w = rbe.points[i + 2].x - rbe.points[i].x;
+                        rect.h = rbe.points[i + 2].y - rbe.points[i].y;
+
+                        RenderTexture(ref renderTexture, ref rect);
+                    }
+
+                    break;
                 case PrimitiveType.QuadsStrip:
 
                     break;
@@ -252,6 +271,7 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
 
                             case PrimitiveType.Quads:
                                 if (pointIndex < 4) return;
+                                
                                 for (int i = 0; i < pointIndex; i += 4)
                                 {
                                     SDL.SDL_Rect rect = new SDL.SDL_Rect();
@@ -282,13 +302,64 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
                 return;
             }
         }
+        
+        public static void RenderTexture(ref Texture2D texture, ref SDL.SDL_Rect rect)
+        {
+            if (SDL.SDL_SetTextureBlendMode(texture.Handle, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND) != 0)
+            {
+                Debug.LogWarn("Failed to set texture blend mode");
+            }
+
+            if (SDL.SDL_SetRenderDrawColor(renderer, texture.Color.r, texture.Color.g, texture.Color.b, texture.Color.a) != 0)
+            {
+                Debug.LogWarn("Failed to set render draw color");
+            }
+
+            if (SDL.SDL_RenderCopy(renderer, texture.Handle, ref rect, ref rect) != 0)
+            {
+                Debug.LogWarn("Failed to render copy");
+            }
+            renderTexture = texture;
+        }
+
+        public static void RenderTexture(Texture2D texture, SDL.SDL_Rect rect, int displayIndex)
+        {
+            if (_isReadCommand == true)
+            {
+                if (DisplayList._displays.TryGetValue((uint)displayIndex, out DisplayList display))
+                {
+                    display.RenderBlocks.Add(() =>
+                    {
+                        if (SDL.SDL_SetTextureBlendMode(texture.Handle, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND) != 0)
+                        {
+                            Debug.LogWarn("Failed to set texture blend mode");
+                        }
+
+                        if (SDL.SDL_SetRenderDrawColor(renderer, texture.Color.r, texture.Color.g, texture.Color.b, texture.Color.a) != 0)
+                        {
+                            Debug.LogWarn("Failed to set render draw color");
+                        }
+                        if(SDL.SDL_SetTextureColorMod(texture.Handle, texture.Color.r, texture.Color.g, texture.Color.b) != 0)
+                        {
+                            Debug.LogWarn("Failed to set texture color mod");
+                        }
+
+                        if (SDL.SDL_RenderCopyEx(renderer, texture.Handle, IntPtr.Zero, ref rect, 0, IntPtr.Zero, SDL.SDL_RendererFlip.SDL_FLIP_NONE) != 0)
+                        {
+                            Debug.LogWarn("Failed to render copy");
+                        }
+                        renderTexture = texture;
+                    });
+                }
+            }
+        }
         /// <summary>
         /// Paints the window in the color of your choice.
         /// </summary>
         /// <param name="color"></param>
         public static void ClearColor(Color color)
         { 
-            SDL.SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+            SDL.SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             SDL.SDL_Rect rect = new SDL.SDL_Rect();
             rect.h = _window.Height;
             rect.w = _window.Width;

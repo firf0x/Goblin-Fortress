@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="GFGraphics\Interfaces\" />
-    <Folder Include="GFLogic\Components\" />
   </ItemGroup>
 
   <ItemGroup>

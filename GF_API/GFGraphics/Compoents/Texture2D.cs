@@ -5,19 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GF_API.Logger;
+using GF_API.GFLogic.Components;
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace GF_API.GFGraphics.Compoents
 {
+    // Size ~ 24 byte.
     public struct Texture2D : IDisposable
     {
-        public string Name { get; set; }
-        public string FileName { get; }
+        public readonly string Name;
+        public readonly string FileName;
+        public Color Color;
         private IntPtr _texture;
+        private SDL.SDL_Rect _rect;
 
         public Texture2D(string filePath, IntPtr renderer)
         {
             LoadTextureFromFile(filePath, renderer);
             Name = "Texture2D";
+            FileName = filePath;
+        }
+        public Texture2D(string name, string filePath, IntPtr renderer)
+        {
+            LoadTextureFromFile(filePath, renderer);
+            Name = name;
             FileName = filePath;
         }
 
@@ -36,7 +48,6 @@ namespace GF_API.GFGraphics.Compoents
 
             SDL.SDL_FreeSurface(_surface);
         }
-
         public IntPtr Handle
         {
             get { return _texture; }
