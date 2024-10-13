@@ -11,6 +11,7 @@ namespace Goblin_Fortress.Components.TileMap
 {
     public class TileMap
     {
+        // 255 TileMap = 428.4 Mb
         public Tile[,] Map { get; private set; }
         private byte _size;
         
@@ -19,6 +20,7 @@ namespace Goblin_Fortress.Components.TileMap
         /// </summary>
         public TileMap(byte sizeArray) 
         {
+            _size = sizeArray;
             Map = new Tile[_size, _size];
         }
         /// <summary>
@@ -36,6 +38,9 @@ namespace Goblin_Fortress.Components.TileMap
         {
             Map = tiles;
         }
+
+        // ~1.68 Mb || 1764001 byte
+        public static int GetSize() => (40 * 210^2) + sizeof(byte);
 
         /// <summary>
         /// Get info.

@@ -310,10 +310,10 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
                 Debug.LogWarn("Failed to set texture blend mode");
             }
 
-            if (SDL.SDL_SetRenderDrawColor(renderer, texture.Color.r, texture.Color.g, texture.Color.b, texture.Color.a) != 0)
-            {
-                Debug.LogWarn("Failed to set render draw color");
-            }
+            //if (SDL.SDL_SetRenderDrawColor(renderer, texture.Color.r, texture.Color.g, texture.Color.b, texture.Color.a) != 0)
+            //{
+            //    Debug.LogWarn("Failed to set render draw color");
+            //}
 
             if (SDL.SDL_RenderCopy(renderer, texture.Handle, ref rect, ref rect) != 0)
             {
@@ -335,14 +335,14 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
                             Debug.LogWarn("Failed to set texture blend mode");
                         }
 
-                        if (SDL.SDL_SetRenderDrawColor(renderer, texture.Color.r, texture.Color.g, texture.Color.b, texture.Color.a) != 0)
+                        /*if (SDL.SDL_SetRenderDrawColor(renderer, texture.Color.r, texture.Color.g, texture.Color.b, texture.Color.a) != 0)
                         {
                             Debug.LogWarn("Failed to set render draw color");
                         }
                         if(SDL.SDL_SetTextureColorMod(texture.Handle, texture.Color.r, texture.Color.g, texture.Color.b) != 0)
                         {
                             Debug.LogWarn("Failed to set texture color mod");
-                        }
+                        }*/
 
                         if (SDL.SDL_RenderCopyEx(renderer, texture.Handle, IntPtr.Zero, ref rect, 0, IntPtr.Zero, SDL.SDL_RendererFlip.SDL_FLIP_NONE) != 0)
                         {

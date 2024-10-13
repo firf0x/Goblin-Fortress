@@ -1,12 +1,14 @@
 ﻿using GF_API.GFGraphics.Compoents;
 using System.Runtime.InteropServices;
+using System.Buffers;
+using GF_API.GFLogic.Components;
 
 namespace Goblin_Fortress.Components.TileMap
 {
+    // Size ~ 8 byte. 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Tile
     {
-        public Texture2D texture { get; set; }
-        public Transform transform { get; set; }
         public GameObject gameObject { get; set; }
 
         /// <summary>

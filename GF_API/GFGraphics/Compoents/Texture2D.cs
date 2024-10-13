@@ -11,25 +11,16 @@ using System.Runtime.InteropServices;
 
 namespace GF_API.GFGraphics.Compoents
 {
-    // Size ~ 24 byte.
+    // Size ~ 28 byte. With a texture 47 byte.
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Texture2D : IDisposable
     {
-        public readonly string Name;
         public readonly string FileName;
-        public Color Color;
         private IntPtr _texture;
-        private SDL.SDL_Rect _rect;
 
         public Texture2D(string filePath, IntPtr renderer)
         {
             LoadTextureFromFile(filePath, renderer);
-            Name = "Texture2D";
-            FileName = filePath;
-        }
-        public Texture2D(string name, string filePath, IntPtr renderer)
-        {
-            LoadTextureFromFile(filePath, renderer);
-            Name = name;
             FileName = filePath;
         }
 
@@ -53,6 +44,10 @@ namespace GF_API.GFGraphics.Compoents
             get { return _texture; }
         }
 
+        public int GetSize()
+        {
+            return Marshal.SizeOf(typeof(Texture2D)) + Color.GetSize() + Encoding.UTF8.GetByteCount(FileName) + Marshal.SizeOf(typeof(IntPtr));
+        }
         public void Dispose()
         {
             SDL.SDL_DestroyTexture(_texture);

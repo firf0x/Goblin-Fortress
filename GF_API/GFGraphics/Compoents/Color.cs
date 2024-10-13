@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +16,11 @@ namespace GF_API.GFGraphics.Compoents
             this.g = g;
             this.b = b;
             this.a = a;
+        }
+        
+        public static int GetSize()
+        {
+            return Marshal.SizeOf(typeof(Color));
         }
     }
 }

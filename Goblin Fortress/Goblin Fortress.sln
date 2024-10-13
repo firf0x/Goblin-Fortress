@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Goblin Fortress", "Goblin Fortress.csproj", "{23221FAD-33B6-460F-8CB1-486EA5F6CA37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GF_API", "..\GF_API\GF_API.csproj", "{4CD7F248-DDD9-4DD8-BE23-11397CBBAB56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GF_API", "..\GF_API\GF_API.csproj", "{4CD7F248-DDD9-4DD8-BE23-11397CBBAB56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

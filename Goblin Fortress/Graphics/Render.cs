@@ -1,11 +1,11 @@
-﻿using GF_API.GFGraphics;
-using GF_API.GFGraphics.Compoents;
+﻿using GF_API.GFGraphics.Compoents;
 using GF_API.GFGraphics.Graphics.RenderViewConsole;
 using GF_API.GFInput;
-using GF_API.Logger;
 using GF_API.GFWindow;
+using GF_API.Logger;
+using Goblin_Fortress.Assets.Scripts;
+using Goblin_Fortress.Components;
 using Goblin_Fortress.Components.TileMap;
-using GF_API.GFLogic.Components;
 
 namespace Goblin_Fortress.Graphics
 {
@@ -31,15 +31,38 @@ namespace Goblin_Fortress.Graphics
         {
             DisplayIndex = DisplayList.NewList(1, DisplayList.ListMode.Compile);
 
-            _texture = new Texture2D("Texture2D", "F:\\Github\\Goblin-Fortress\\Goblin Fortress\\bin\\Debug\\net8.0\\Texture\\TileMap.bmp", RVC.renderer);
+            _texture = new Texture2D("Texture\\TileMap.bmp", RVC.renderer);
             rect = new SDL2.SDL.SDL_Rect();
+
+            TileMap[] tileMaps = new TileMap[255];
+            
+            Tile tile = new Tile();
+            
+            GameObject gameObject = new Block();
+            gameObject.Init("Test Block", new GF_API.GFLogic.Components.Vector2Byte(0,0), _texture);
+
+            tile.gameObject = gameObject;
+
+            for (int i = 0; i < 255; i++)
+            {
+                tileMaps[i] = new TileMap(210);
+                for (byte y = 0; y < 210; y++)
+                {
+                    for (byte x = 0; x < 210; x++)
+                    {
+                        tileMaps[i].SetTile(tile, new GF_API.GFLogic.Components.Vector2Byte(x, y));
+                    }
+                }
+            }
+            Debug.LogWarn("Ready!");
+            long memory = GC.GetTotalMemory(true);
+            Debug.LogWarn($"{memory}");
         }
 
         float x;
         float y;
         float w; 
         float h;
-        byte i;
 
         private void OnUnload()
         {
@@ -106,10 +129,10 @@ namespace Goblin_Fortress.Graphics
             //float y = (float)Math.Cos(angle) * angle;
             //RVC.Vertex2(_window.Width / 2 + x, _window.Height / 2 + y);
 
-            _texture.Color.r = 255;
-            _texture.Color.g = 255;
-            _texture.Color.b = 0;
-            _texture.Color.a = 255;
+            //_texture.Color.r = 255;
+            //_texture.Color.g = 255;
+            //_texture.Color.b = 0;
+            //_texture.Color.a = 255;
 
             rect.x = (int)x;
             rect.y = (int)y;
