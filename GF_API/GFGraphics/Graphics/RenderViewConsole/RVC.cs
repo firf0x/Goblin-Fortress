@@ -27,7 +27,7 @@ namespace GF_API.GFGraphics.Graphics.RenderViewConsole
         public RVC(GameWindow window)
         {
             _window = window;
-            renderer = SDL.SDL_CreateRenderer(_window.WindowPtr, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            renderer = SDL.SDL_CreateRenderer(_window.WindowPtr, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL.SDL_RendererFlags.SDL_RENDERER_TARGETTEXTURE);
         }
 
         /// <summary>

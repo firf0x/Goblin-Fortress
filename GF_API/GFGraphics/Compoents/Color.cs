@@ -10,6 +10,13 @@ namespace GF_API.GFGraphics.Compoents
     public struct Color
     {
         public byte r, g, b, a;
+        public Color()
+        {
+            r = 255;
+            g = 255;
+            b = 255;
+            a = 255;
+        }
         public Color(byte r, byte g, byte b, byte a)
         {
             this.r = r;

@@ -16,6 +16,7 @@ namespace GF_API.GFGraphics.Compoents
     public struct Texture2D : IDisposable
     {
         public readonly string FileName;
+        public Color color { get; set; }
         private IntPtr _texture;
 
         public Texture2D(string filePath, IntPtr renderer)

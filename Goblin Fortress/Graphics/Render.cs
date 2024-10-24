@@ -16,47 +16,50 @@ namespace Goblin_Fortress.Graphics
 
         private int DisplayIndex;
         private Texture2D _texture;
+
+        private TileMap[] tileMaps;
+        
+        Tile tile;
         internal Render(GameWindow window) 
         {
             _window = window;
+            window.OnLoad += OnLoad;
+
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdate;
 
-            window.OnLoad += OnLoad;
             window.OnUnload += OnUnload;
         }
 
         private SDL2.SDL.SDL_Rect rect;
         private void OnLoad()
         {
-            DisplayIndex = DisplayList.NewList(1, DisplayList.ListMode.Compile);
+            DisplayIndex = DisplayList.NewList(DisplayList.GenList(), DisplayList.ListMode.Compile);
 
             _texture = new Texture2D("Texture\\TileMap.bmp", RVC.renderer);
+            _texture.color = new Color(255, 255, 255, 125);
             rect = new SDL2.SDL.SDL_Rect();
 
-            TileMap[] tileMaps = new TileMap[255];
+            tileMaps = new TileMap[255];
             
-            Tile tile = new Tile();
-            
-            GameObject gameObject = new Block();
-            gameObject.Init("Test Block", new GF_API.GFLogic.Components.Vector2Byte(0,0), _texture);
+            tile = new Tile();
 
+            GameObject gameObject = new Block();
+            gameObject.Init("Test Block", new GF_API.GFLogic.Components.Vector2Byte(0, 0), _texture);
+            var a = new GF_API.GFLogic.Components.Vector2Byte();
             tile.gameObject = gameObject;
 
             for (int i = 0; i < 255; i++)
             {
-                tileMaps[i] = new TileMap(210);
-                for (byte y = 0; y < 210; y++)
+                tileMaps[i] = new TileMap(15, 10);
+                for (byte y = 0; y < 15; y++)
                 {
-                    for (byte x = 0; x < 210; x++)
+                    for (byte x = 0; x < 15; x++)
                     {
-                        tileMaps[i].SetTile(tile, new GF_API.GFLogic.Components.Vector2Byte(x, y));
+                        tileMaps[0].SetTile(tile, new GF_API.GFLogic.Components.Vector2Byte(x, y));
                     }
                 }
             }
-            Debug.LogWarn("Ready!");
-            long memory = GC.GetTotalMemory(true);
-            Debug.LogWarn($"{memory}");
         }
 
         float x;
@@ -66,7 +69,7 @@ namespace Goblin_Fortress.Graphics
 
         private void OnUnload()
         {
-
+            Dispose();
         }
 
         private void OnUpdate()
@@ -110,42 +113,18 @@ namespace Goblin_Fortress.Graphics
                 w -= 1;
                 //Debug.LogWarn(Input.KeyCode.Left.ToString());
             }
+            //Debug.Log((double)(SDL2.SDL.SDL_GetPerformanceCounter() / SDL2.SDL.SDL_GetPerformanceFrequency()));
+            //Debug.Log($"\n{SDL2.SDL.SDL_GetCPUCount()} : ");
         }
 
         
         private void OnRenderFrame()
         {
-            RVC.ClearColor(new Color(255,255,255,255));
+            RVC.ClearColor(new Color(0,0,0,255));
 
-            // Create List
+            tileMaps[0].RenderMap();
 
-            // Begin
-            RVC.Begin(PrimitiveType.Points, DisplayIndex);
-
-            
-            RVC.VertexColor(new Color(0,0,0,255), DisplayIndex);
-
-            //float x = (float)Math.Sin(angle) * 10;
-            //float y = (float)Math.Cos(angle) * angle;
-            //RVC.Vertex2(_window.Width / 2 + x, _window.Height / 2 + y);
-
-            //_texture.Color.r = 255;
-            //_texture.Color.g = 255;
-            //_texture.Color.b = 0;
-            //_texture.Color.a = 255;
-
-            rect.x = (int)x;
-            rect.y = (int)y;
-            rect.h = (int)h;
-            rect.w = (int)w;
-            RVC.RenderTexture(_texture, rect, DisplayIndex);
-            // End
-            RVC.End(DisplayIndex);
-
-            // Render all render block 
-            DisplayList.EndList();
-
-            // Call all invoke 
+            // Call aall invoke 
             DisplayList.CallLists();
 
             RVC.SwapBuffers();

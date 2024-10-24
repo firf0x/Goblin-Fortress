@@ -9,23 +9,23 @@ using System.Threading.Tasks;
 
 namespace Goblin_Fortress.Assets.Scripts
 {
-    public class Block : GameObject
+    internal class Block : GameObject
     {
+        private ListComponents Components;
+        public Block() 
+        {
+            Components = new ListComponents();
+        }
         public override void Init(string Name, Vector2Byte Position, Texture2D Texture)
         {
             name = Name;
             position = Position;
             texture = Texture;
+            Enabled = true;
         }
-
-        public void TickUpdate()
-        {
-            
-        }
-
         public override void Destroy()
         {
-
+            // TODO: Come up with something.
         }
     }
 }

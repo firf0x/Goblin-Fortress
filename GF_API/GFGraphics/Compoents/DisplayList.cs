@@ -14,12 +14,27 @@ namespace GF_API.GFGraphics.Compoents
     /// </summary>
     public class DisplayList
     {
-        internal static Dictionary<uint, DisplayList> _displays = new Dictionary<uint, DisplayList>();
-        internal List<Action> RenderBlocks = new List<Action>();
+        public static Dictionary<uint, DisplayList> _displays { get; private set; } = new Dictionary<uint, DisplayList>();
+        public List<Action> RenderBlocks { get; private set; } = new List<Action>();
 
         private static bool _activate;
 
         private static List<uint> _diplaysIndex = new List<uint>();
+
+        public static uint GenList()
+        {
+            if (_diplaysIndex.Count == 0)
+            {
+                _diplaysIndex.Add(1);
+                return 1;
+            }
+
+            for (int i = 0; i < _diplaysIndex.Count; i++)
+            {
+                if (_diplaysIndex.Contains(_diplaysIndex[i])) return _diplaysIndex.Last()+1;
+            }
+            return 0;
+        }
 
         public static int NewList(uint listId, ListMode mode)
         {
@@ -48,9 +63,9 @@ namespace GF_API.GFGraphics.Compoents
         {
             foreach (var display in _displays)
             {
-                foreach(var item in display.Value.RenderBlocks)
+                for (int i = 0; i < display.Value.RenderBlocks.Count; i++)
                 {
-                    item.Invoke();
+                    display.Value.RenderBlocks[i]?.Invoke();
                 }
                 display.Value.RenderBlocks.Clear();
             }

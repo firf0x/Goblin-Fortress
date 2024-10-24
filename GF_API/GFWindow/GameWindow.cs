@@ -1,6 +1,7 @@
 ﻿using SDL2;
 using GF_API.GFGraphics.Graphics.RenderViewConsole;
 using GF_API.Logger;
+using System.ComponentModel;
 
 namespace GF_API.GFWindow
 {
@@ -25,8 +26,13 @@ namespace GF_API.GFWindow
         private bool isUpdate = true;
         private bool isRender = true;
 
+        private BackgroundWorker _renderWorker;
+        
         public void Create()
         {
+            _renderWorker = new BackgroundWorker();
+            _renderWorker.DoWork += RenderLoop;
+
             // Title != Empty (null)
             if (string.IsNullOrEmpty(Title))
             {
@@ -62,6 +68,9 @@ namespace GF_API.GFWindow
             bool run = true;
 
             OnLoad?.Invoke();
+
+            _renderWorker.RunWorkerAsync();
+
             while (run)
             {
                 SDL.SDL_Event e;
@@ -84,24 +93,28 @@ namespace GF_API.GFWindow
                     isUpdate = false;
                 }
 
-                while (isRender)
-                {
-                    // framerate:
-                    // 16 = 60.0fps
-                    // 33 ~ 30.0fps
-                    RenderFrame?.Invoke();
-                    SDL.SDL_Delay(16);
-                    isRender = false;
-                }
-
                 isUpdate = !isUpdate;
-                isRender = !isRender;
             }
-
+            
+            isUpdate = false;
+            isRender = false;
+            
             Dispose();
             rvc.Dispose();
 
             OnUnload?.Invoke();
+        }
+
+        private void RenderLoop(object sender, DoWorkEventArgs e)
+        {
+            while (isRender)
+            {
+                // framerate:
+                // 16 = 60.0fps
+                // 33 ~ 30.0fps
+                RenderFrame?.Invoke();
+                SDL.SDL_Delay(16);
+            }
         }
         public void Dispose()
         {
@@ -110,11 +123,13 @@ namespace GF_API.GFWindow
         }
         protected virtual void Dispose(bool disposing)
         {
-            if (WindowPtr != IntPtr.Zero)
+            if (WindowPtr != IntPtr.Zero & _renderWorker != null)
             {
                 SDL.SDL_DestroyWindow(WindowPtr);
                 WindowPtr = IntPtr.Zero;
+                _renderWorker.Dispose();
             }
+
             SDL.SDL_Quit();
             GC.Collect();
         }
